@@ -15,5 +15,5 @@ type UserRepoI interface {
 	Create(context.Context, *auth_service.CreateUser) (*auth_service.UserPK, error)
 	GetByPKey(context.Context, *auth_service.UserPK) (*auth_service.User, error)
 	GetAll(context.Context, *auth_service.UserListRequest) (*auth_service.UserListResponse, error)
-	GetUserByUsername(context.Context, string)(*auth_service.User, error)
+	GetUserByUsername(context.Context, *auth_service.GetByName) (*auth_service.User, error)
 }

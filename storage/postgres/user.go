@@ -187,7 +187,7 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 	return
 }
 
-func (u *userRepo) GetUserByUsername(ctx context.Context, username string)(resp *auth_service.User, err error){
+func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetByName)(resp *auth_service.User, err error){
 	query := `
 		SELECT 
 			id,
@@ -211,7 +211,7 @@ func (u *userRepo) GetUserByUsername(ctx context.Context, username string)(resp 
 		updated_at sql.NullString
 	)
 
-	err = u.db.QueryRow(ctx, query, username).Scan(
+	err = u.db.QueryRow(ctx, query, req.Name).Scan(
 		&id,
 		&name,
 		&email,
@@ -236,92 +236,3 @@ func (u *userRepo) GetUserByUsername(ctx context.Context, username string)(resp 
 
 	return
 }
-
-// func (u *userRepo) Update(ctx context.Context, req *auth_service.Update) (rowsAffected int64, err error) {
-
-// 	var (
-// 		query  string
-// 		params map[string]interface{}
-// 	)
-
-// 	query = `
-// 		UPDATE
-// 			"user"
-// 		SET
-// 			name = :name,
-// 			email = :email,
-// 			key = :key,
-// 			secret = :secret,
-// 			updated_at = now()
-// 		WHERE id = :id
-// 	`
-// 	params = map[string]interface{}{
-// 		"id":     req.GetId(),
-// 		"name":   req.GetLastName(),
-// 		"email":  req.GetLastName(),
-// 		"key":    req.GetPhoneNumber(),
-// 		"secret": req.GetDateOfBirth(),
-// 	}
-
-// 	query, args := helper.ReplaceQueryParams(query, params)
-
-// 	result, err := u.db.Exec(ctx, query, args...)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	return result.RowsAffected(), nil
-// }
-
-// func (u *userRepo) UpdatePatch(ctx context.Context, req *models.UpdatePatchRequest) (rowsAffected int64, err error) {
-
-// 	var (
-// 		set   = " SET "
-// 		ind   = 0
-// 		query string
-// 	)
-
-// 	if len(req.Fields) == 0 {
-// 		err = errors.New("no updates provided")
-// 		return
-// 	}
-
-// 	req.Fields["id"] = req.Id
-
-// 	for key := range req.Fields {
-// 		set += fmt.Sprintf(" %s = :%s ", key, key)
-// 		if ind != len(req.Fields)-1 {
-// 			set += ", "
-// 		}
-// 		ind++
-// 	}
-
-// 	query = `
-// 		UPDATE
-// 			"user"
-// 	` + set + ` , updated_at = now()
-// 		WHERE
-// 			id = :id
-// 	`
-
-// 	query, args := helper.ReplaceQueryParams(query, req.Fields)
-
-// 	result, err := u.db.Exec(ctx, query, args...)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	return result.RowsAffected(), err
-// }
-
-// func (u *userRepo) Delete(ctx context.Context, req *auth_service.UserPK) error {
-
-// 	query := `DELETE FROM "user" WHERE id = $1`
-
-// 	_, err := u.db.Exec(ctx, query, req.Id)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }

@@ -35,7 +35,6 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 }
 
 func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.User, error) {
-	fmt.Println("----------------------------------------------------------------")
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
 
 	if len(req.Secret) < 6 {
@@ -50,7 +49,6 @@ func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) 
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	req.Secret = hashedPassword
-	fmt.Println(hashedPassword)
 
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	email := emailRegex.MatchString(req.Email)
@@ -79,7 +77,7 @@ func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUser
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	user, err := s.strg.User().GetUserByUsername(ctx, req.Name)
+	user, err := s.strg.User().GetUserByUsername(ctx, &auth_service.GetByName{Name:req.Name})
 	if err != nil {
 		s.log.Error("!!!Login 3--->", logger.Error(err))
 		return &auth_service.CheckUserResponse{Exists: false, Registered: false}, nil
@@ -99,6 +97,19 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 	resp, err = i.strg.User().GetByPKey(ctx, req)
 	if err != nil {
 		i.log.Error("!!!GetUserByID->User->Get--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return
+}
+
+func (i *UserService) GetByName(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
+
+	i.log.Info("---GetUserByName------>", logger.Any("req", req))
+
+	resp, err = i.strg.User().GetUserByUsername(ctx, req)
+	if err != nil {
+		i.log.Error("!!!GetUserByName->User->Get--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 

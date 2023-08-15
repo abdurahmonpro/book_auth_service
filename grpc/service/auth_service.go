@@ -40,7 +40,7 @@ func (s *authService) Login(ctx context.Context, req *auth_service.LoginRequest)
 	errAuth := errors.New("username or password wrong")
 	errNotfound := errors.New("password is wrong")
 
-	user, err := s.strg.User().GetUserByUsername(ctx, req.Name)
+	user, err := s.strg.User().GetUserByUsername(ctx, &auth_service.GetByName{Name: req.Name})
 	if err != nil {
 		log.Println(err.Error())
 		return nil, status.Errorf(codes.Unauthenticated, errAuth.Error())

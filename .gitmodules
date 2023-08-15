@@ -1,0 +1,3 @@
+[submodule "all_protos"]
+	path = all_protos
+	url = git@github.com:abdurahmonpro/all_protos.git

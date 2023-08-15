@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS "user" (
+    "id" UUID PRIMARY KEY,
+    "name" VARCHAR(30) NOT NULL,
+    "email" VARCHAR(30) NOT NULL,
+    "key" VARCHAR(17) NOT NULL UNIQUE,
+    "secret" TEXT NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);

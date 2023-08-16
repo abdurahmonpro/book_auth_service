@@ -61,9 +61,7 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 			name,
 			email,
 			key,
-			secret,
-			created_at,
-			updated_at
+			secret
 		FROM "user"
 		WHERE id = $1
 	`
@@ -74,8 +72,6 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 		email      sql.NullString
 		key        sql.NullString
 		secret     sql.NullString
-		created_at sql.NullString
-		updated_at sql.NullString
 	)
 
 	err = u.db.QueryRow(ctx, query, req.Id).Scan(
@@ -84,8 +80,6 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 		&email,
 		&key,
 		&secret,
-		&created_at,
-		&updated_at,
 	)
 	if err != nil {
 		return user, err
@@ -97,8 +91,6 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 		Email:     email.String,
 		Key:       key.String,
 		Secret:    secret.String,
-		CreatedAt: created_at.String,
-		UpdatedAt: updated_at.String,
 	}
 
 	return
@@ -123,9 +115,7 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			name,
 			email,
 			key,
-			secret,
-			TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS'),
-			TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI:SS')
+			secret
 		FROM "user"
 	`
 	if len(req.GetSearch()) > 0 {
@@ -155,8 +145,6 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			email      sql.NullString
 			key        sql.NullString
 			secret     sql.NullString
-			created_at sql.NullString
-			updated_at sql.NullString
 		)
 
 		err := rows.Scan(
@@ -166,8 +154,6 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			&email,
 			&key,
 			&secret,
-			&created_at,
-			&updated_at,
 		)
 		if err != nil {
 			return resp, err
@@ -179,8 +165,6 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			Email:     email.String,
 			Key:       key.String,
 			Secret:    secret.String,
-			CreatedAt: created_at.String,
-			UpdatedAt: updated_at.String,
 		})
 	}
 
@@ -194,9 +178,7 @@ func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetBy
 			name,
 			email,
 			key,
-			secret,
-			created_at,
-			updated_at
+			secret
 		FROM "user"
 		WHERE name = $1
 	`
@@ -207,8 +189,6 @@ func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetBy
 		email      sql.NullString
 		key        sql.NullString
 		secret     sql.NullString
-		created_at sql.NullString
-		updated_at sql.NullString
 	)
 
 	err = u.db.QueryRow(ctx, query, req.Name).Scan(
@@ -217,8 +197,6 @@ func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetBy
 		&email,
 		&key,
 		&secret,
-		&created_at,
-		&updated_at,
 	)
 	if err != nil {
 		return resp, err
@@ -230,8 +208,6 @@ func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetBy
 		Email:     email.String,
 		Key:       key.String,
 		Secret:    secret.String,
-		CreatedAt: created_at.String,
-		UpdatedAt: updated_at.String,
 	}
 
 	return

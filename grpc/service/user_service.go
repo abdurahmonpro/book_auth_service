@@ -103,7 +103,7 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 	return
 }
 
-func (i *UserService) GetByName(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
+func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
 
 	i.log.Info("---GetUserByName------>", logger.Any("req", req))
 

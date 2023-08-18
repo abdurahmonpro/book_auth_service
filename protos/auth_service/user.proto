@@ -11,6 +11,12 @@ message User {
     string secret = 5;
 }
 
+message CreateUserResponse {
+    repeated User data = 1;
+    bool is_ok = 2;
+    string message = 3;
+}
+
 message CreateUser{
     string name = 1;
     string email = 2;

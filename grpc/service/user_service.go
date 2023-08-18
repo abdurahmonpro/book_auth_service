@@ -33,12 +33,11 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 		services: srvs,
 	}
 }
-
-func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.User, error) {
+func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.CreateUserResponse, error) {
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
 
 	if len(req.Secret) < 6 {
-		err := fmt.Errorf("password must not be less than 6 characters")
+		err := fmt.Errorf("password must be at least 6 characters")
 		s.log.Error("!!!CreateUser--->", logger.Error(err))
 		return nil, err
 	}
@@ -51,21 +50,31 @@ func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) 
 	req.Secret = hashedPassword
 
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	email := emailRegex.MatchString(req.Email)
-	if !email {
+	if !emailRegex.MatchString(req.Email) {
 		err = fmt.Errorf("email is not valid")
 		s.log.Error("!!!CreateUser--->", logger.Error(err))
 		return nil, err
 	}
 
 	pKey, err := s.strg.User().Create(ctx, req)
-
 	if err != nil {
 		s.log.Error("!!!CreateUser--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.Internal, "failed to create user")
 	}
 
-	return s.strg.User().GetByPKey(ctx, pKey)
+	createdUser, err := s.strg.User().GetByPKey(ctx, pKey)
+	if err != nil {
+		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		return nil, status.Error(codes.Internal, "failed to fetch created user")
+	}
+
+	response := &auth_service.CreateUserResponse{
+		Data:    []*auth_service.User{createdUser},
+		IsOk:    true,
+		Message: "ok",
+	}
+
+	return response, nil
 }
 
 func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUserRequest) (*auth_service.CheckUserResponse, error) {
@@ -77,7 +86,7 @@ func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUser
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	user, err := s.strg.User().GetUserByUsername(ctx, &auth_service.GetByName{Name:req.Name})
+	user, err := s.strg.User().GetUserByUsername(ctx, &auth_service.GetByName{Name: req.Name})
 	if err != nil {
 		s.log.Error("!!!Login 3--->", logger.Error(err))
 		return &auth_service.CheckUserResponse{Exists: false, Registered: false}, nil
@@ -102,19 +111,30 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 
 	return
 }
-
-func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
-
+func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (*auth_service.CreateUserResponse, error) {
+	
 	i.log.Info("---GetUserByName------>", logger.Any("req", req))
 
-	resp, err = i.strg.User().GetUserByUsername(ctx, req)
+	user, err := i.strg.User().GetUserByUsername(ctx, req)
 	if err != nil {
 		i.log.Error("!!!GetUserByName->User->Get--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+
+		response := &auth_service.CreateUserResponse{
+			Data:    []*auth_service.User{},
+			IsOk:    true,
+			Message: "unable to authorize",
+		}
+		return response, nil
 	}
 
-	return
+	response := &auth_service.CreateUserResponse{
+		Data:    []*auth_service.User{user},
+		IsOk:    true,
+		Message: "ok",
+	}
+	return response, nil
 }
+
 
 func (i *UserService) GetList(ctx context.Context, req *auth_service.UserListRequest) (resp *auth_service.UserListResponse, err error) {
 

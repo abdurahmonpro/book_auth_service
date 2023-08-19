@@ -41,7 +41,7 @@ func main() {
 
 	grpcServer := grpc.SetUpServer(cfg, log, pgStore, svcs)
 
-	lis, err := net.Listen("tcp", cfg.AuthServiceHost)
+	lis, err := net.Listen("tcp", cfg.AuthGRPCPort)
 	if err != nil {
 		log.Panic("net.Listen", logger.Error(err))
 	}

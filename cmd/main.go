@@ -6,6 +6,7 @@ import (
 	"auth_service/grpc/client"
 	"auth_service/pkg/logger"
 	"auth_service/storage/postgres"
+
 	"context"
 	"net"
 )
@@ -40,7 +41,7 @@ func main() {
 
 	grpcServer := grpc.SetUpServer(cfg, log, pgStore, svcs)
 
-	lis, err := net.Listen("tcp", cfg.AuthGRPCPort)
+	lis, err := net.Listen("tcp", cfg.AuthServiceHost)
 	if err != nil {
 		log.Panic("net.Listen", logger.Error(err))
 	}

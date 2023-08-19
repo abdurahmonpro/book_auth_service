@@ -4,7 +4,7 @@ import (
 	"auth_service/config"
 	"auth_service/genproto/auth_service"
 	"auth_service/grpc/client"
-	"auth_service/pkg/helper/security"
+	"auth_service/pkg/security"
 	"auth_service/pkg/logger"
 	"auth_service/storage"
 	"errors"

@@ -159,7 +159,7 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			return resp, err
 		}
 
-		resp.Users = append(resp.Users, &auth_service.User{
+		resp.Users = append(resp.Users,  &auth_service.User{
 			Id:        id.String,
 			Name:      name.String,
 			Email:     email.String,

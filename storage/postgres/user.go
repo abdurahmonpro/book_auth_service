@@ -171,7 +171,7 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 	return
 }
 
-func (u *userRepo) GetUserByUsername(ctx context.Context,req *auth_service.GetByName)(resp *auth_service.User, err error){
+func (u *userRepo) GetUserByUsername( ctx context.Context,req *auth_service.GetByName)(resp *auth_service.User, err error){
 	query := `
 		SELECT 
 			id,

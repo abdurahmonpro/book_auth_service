@@ -6,9 +6,9 @@ option go_package="genproto/auth_service";
 import "user.proto";
 
 service UserService {
-    rpc Create(CreateUser) returns (CreateUserResponse) {}
+    rpc Create(CreateUser) returns (OneUserResponse) {}
     rpc GetByID(UserPK) returns (User) {}
     rpc GetUserList(UserListRequest) returns (UserListResponse) {}
     rpc CheckUser(CheckUserRequest) returns (CheckUserResponse) {}
-    rpc GetUserByName(GetByName ) returns (CreateUserResponse) {}
+    rpc GetUserByName(GetByName ) returns (OneUserResponse) {}
 }

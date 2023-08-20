@@ -17,6 +17,12 @@ message CreateUserResponse {
     string message = 3;
 }
 
+message OneUserResponse {
+    User data = 1;
+    bool is_ok = 2;
+    string message = 3;
+}
+
 message UserWrongResponse {
     string data = 1;
     bool is_ok = 2;

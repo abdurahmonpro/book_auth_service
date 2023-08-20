@@ -30,11 +30,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	Create(ctx context.Context, in *CreateUser, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	Create(ctx context.Context, in *CreateUser, opts ...grpc.CallOption) (*OneUserResponse, error)
 	GetByID(ctx context.Context, in *UserPK, opts ...grpc.CallOption) (*User, error)
 	GetUserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	CheckUser(ctx context.Context, in *CheckUserRequest, opts ...grpc.CallOption) (*CheckUserResponse, error)
-	GetUserByName(ctx context.Context, in *GetByName, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	GetUserByName(ctx context.Context, in *GetByName, opts ...grpc.CallOption) (*OneUserResponse, error)
 }
 
 type userServiceClient struct {
@@ -45,8 +45,8 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) Create(ctx context.Context, in *CreateUser, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
+func (c *userServiceClient) Create(ctx context.Context, in *CreateUser, opts ...grpc.CallOption) (*OneUserResponse, error) {
+	out := new(OneUserResponse)
 	err := c.cc.Invoke(ctx, UserService_Create_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,8 @@ func (c *userServiceClient) CheckUser(ctx context.Context, in *CheckUserRequest,
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserByName(ctx context.Context, in *GetByName, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
+func (c *userServiceClient) GetUserByName(ctx context.Context, in *GetByName, opts ...grpc.CallOption) (*OneUserResponse, error) {
+	out := new(OneUserResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserByName_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -94,11 +94,11 @@ func (c *userServiceClient) GetUserByName(ctx context.Context, in *GetByName, op
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	Create(context.Context, *CreateUser) (*CreateUserResponse, error)
+	Create(context.Context, *CreateUser) (*OneUserResponse, error)
 	GetByID(context.Context, *UserPK) (*User, error)
 	GetUserList(context.Context, *UserListRequest) (*UserListResponse, error)
 	CheckUser(context.Context, *CheckUserRequest) (*CheckUserResponse, error)
-	GetUserByName(context.Context, *GetByName) (*CreateUserResponse, error)
+	GetUserByName(context.Context, *GetByName) (*OneUserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -106,7 +106,7 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) Create(context.Context, *CreateUser) (*CreateUserResponse, error) {
+func (UnimplementedUserServiceServer) Create(context.Context, *CreateUser) (*OneUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedUserServiceServer) GetByID(context.Context, *UserPK) (*User, error) {
@@ -118,7 +118,7 @@ func (UnimplementedUserServiceServer) GetUserList(context.Context, *UserListRequ
 func (UnimplementedUserServiceServer) CheckUser(context.Context, *CheckUserRequest) (*CheckUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckUser not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserByName(context.Context, *GetByName) (*CreateUserResponse, error) {
+func (UnimplementedUserServiceServer) GetUserByName(context.Context, *GetByName) (*OneUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByName not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

@@ -29,7 +29,7 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 		services: srvs,
 	}
 }
-func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.CreateUserResponse, error) {
+func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.OneUserResponse, error) {
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
 
 	// if len(req.Secret) < 6 {
@@ -64,8 +64,8 @@ func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) 
 		return nil, status.Error(codes.Internal, "failed to fetch created user")
 	}
 
-	response := &auth_service.CreateUserResponse{
-		Data:    []*auth_service.User{createdUser},
+	response := &auth_service.OneUserResponse{
+		Data:    createdUser,
 		IsOk:    true,
 		Message: "ok",
 	}
@@ -108,24 +108,18 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 	return
 }
 
-func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (*auth_service.CreateUserResponse, error) {
+func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (*auth_service.OneUserResponse, error) {
 
 	i.log.Info("---GetUserByName------>", logger.Any("req", req))
 
 	user, err := i.strg.User().GetUserByUsername(ctx, req)
 	if err != nil {
 		i.log.Error("!!!GetUserByName->User->Get--->", logger.Error(err))
-
-		response := &auth_service.CreateUserResponse{
-			Data:    []*auth_service.User{},
-			IsOk:    true,
-			Message: "unable to authorize",
-		}
-		return response, nil
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	response := &auth_service.CreateUserResponse{
-		Data:    []*auth_service.User{user},
+	response := &auth_service.OneUserResponse{
+		Data:    user,
 		IsOk:    true,
 		Message: "ok",
 	}

@@ -4,12 +4,8 @@ import (
 	"auth_service/config"
 	"auth_service/genproto/auth_service"
 	"auth_service/grpc/client"
-	"auth_service/pkg/security"
 	"auth_service/pkg/logger"
 	"auth_service/storage"
-	"errors"
-	"fmt"
-	"regexp"
 
 	"context"
 
@@ -36,25 +32,25 @@ func NewUserService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) (*auth_service.CreateUserResponse, error) {
 	s.log.Info("---CreateUser--->", logger.Any("req", req))
 
-	if len(req.Secret) < 6 {
-		err := fmt.Errorf("password must be at least 6 characters")
-		s.log.Error("!!!CreateUser--->", logger.Error(err))
-		return nil, err
-	}
+	// if len(req.Secret) < 6 {
+	// 	err := fmt.Errorf("password must be at least 6 characters")
+	// 	s.log.Error("!!!CreateUser--->", logger.Error(err))
+	// 	return nil, err
+	// }
 
-	hashedPassword, err := security.HashPassword(req.Secret)
-	if err != nil {
-		s.log.Error("!!!CreateUser--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-	req.Secret = hashedPassword
+	// hashedPassword, err := security.HashPassword(req.Secret)
+	// if err != nil {
+	// 	s.log.Error("!!!CreateUser--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
+	// req.Secret = hashedPassword
 
-	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	if !emailRegex.MatchString(req.Email) {
-		err = fmt.Errorf("email is not valid")
-		s.log.Error("!!!CreateUser--->", logger.Error(err))
-		return nil, err
-	}
+	// emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	// if !emailRegex.MatchString(req.Email) {
+	// 	err = fmt.Errorf("email is not valid")
+	// 	s.log.Error("!!!CreateUser--->", logger.Error(err))
+	// 	return nil, err
+	// }
 
 	pKey, err := s.strg.User().Create(ctx, req)
 	if err != nil {
@@ -64,7 +60,7 @@ func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) 
 
 	createdUser, err := s.strg.User().GetByPKey(ctx, pKey)
 	if err != nil {
-		s.log.Error("!!!CreateUser--->", logger.Error(err))
+		s.log.Error("!!!GetByidUser--->", logger.Error(err))
 		return nil, status.Error(codes.Internal, "failed to fetch created user")
 	}
 
@@ -80,11 +76,11 @@ func (s *UserService) Create(ctx context.Context, req *auth_service.CreateUser) 
 func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUserRequest) (*auth_service.CheckUserResponse, error) {
 	s.log.Info("---CheckUser--->", logger.Any("req", req))
 
-	if len(req.Secret) < 6 {
-		err := errors.New("invalid password")
-		s.log.Error("!!!Login 2--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
+	// if len(req.Secret) < 6 {
+	// 	err := errors.New("invalid password")
+	// 	s.log.Error("!!!Login 2--->", logger.Error(err))
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
 	user, err := s.strg.User().GetUserByUsername(ctx, &auth_service.GetByName{Name: req.Name})
 	if err != nil {
@@ -96,7 +92,7 @@ func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUser
 		return &auth_service.CheckUserResponse{Exists: true, Registered: true}, nil
 	}
 
-	return &auth_service.CheckUserResponse{Exists: true}, nil
+	return &auth_service.CheckUserResponse{Exists: false, Registered: false}, nil
 }
 
 func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (resp *auth_service.User, err error) {
@@ -112,7 +108,7 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 	return
 }
 func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (*auth_service.CreateUserResponse, error) {
-	
+
 	i.log.Info("---GetUserByName------>", logger.Any("req", req))
 
 	user, err := i.strg.User().GetUserByUsername(ctx, req)
@@ -134,7 +130,6 @@ func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetBy
 	}
 	return response, nil
 }
-
 
 func (i *UserService) GetList(ctx context.Context, req *auth_service.UserListRequest) (resp *auth_service.UserListResponse, err error) {
 

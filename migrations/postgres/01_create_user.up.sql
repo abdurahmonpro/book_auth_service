@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "user" (
-    "id" UUID PRIMARY KEY,
+    "id" SERIAL PRIMARY KEY,
     "name" VARCHAR(30) NOT NULL,
     "email" VARCHAR(30) NOT NULL,
     "key" VARCHAR(17) NOT NULL UNIQUE,

@@ -107,6 +107,7 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 
 	return
 }
+
 func (i *UserService) GetUserByName(ctx context.Context, req *auth_service.GetByName) (*auth_service.CreateUserResponse, error) {
 
 	i.log.Info("---GetUserByName------>", logger.Any("req", req))

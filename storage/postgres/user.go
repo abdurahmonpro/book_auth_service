@@ -7,7 +7,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -22,35 +21,32 @@ func NewUserRepo(db *pgxpool.Pool) *userRepo {
 }
 
 func (u *userRepo) Create(ctx context.Context, req *auth_service.CreateUser) (resp *auth_service.UserPK, err error) {
-
-	id := uuid.New().String()
-
 	query := `
 		INSERT INTO "user" (
-			id,
 			name,
 			email,
 			key,
 			secret,
 			created_at,
 			updated_at
-		) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+		) VALUES ($1, $2, $3, $4, NOW(), NOW())
+		RETURNING id
 	`
 
-	_, err = u.db.Exec(
+	var id int
+	err = u.db.QueryRow(
 		ctx,
 		query,
-		id,
 		req.Name,
 		req.Email,
 		req.Key,
 		req.Secret,
-	)
+	).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &auth_service.UserPK{Id: id}, nil
+	return &auth_service.UserPK{Id: int32(id)}, nil
 }
 
 func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (user *auth_service.User, err error) {
@@ -67,11 +63,11 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 	`
 
 	var (
-		id         sql.NullString
-		name       sql.NullString
-		email      sql.NullString
-		key        sql.NullString
-		secret     sql.NullString
+		id     sql.NullInt32
+		name   sql.NullString
+		email  sql.NullString
+		key    sql.NullString
+		secret sql.NullString
 	)
 
 	err = u.db.QueryRow(ctx, query, req.Id).Scan(
@@ -86,11 +82,11 @@ func (u *userRepo) GetByPKey(ctx context.Context, req *auth_service.UserPK) (use
 	}
 
 	user = &auth_service.User{
-		Id:        id.String,
-		Name:      name.String,
-		Email:     email.String,
-		Key:       key.String,
-		Secret:    secret.String,
+		Id:     id.Int32,
+		Name:   name.String,
+		Email:  email.String,
+		Key:    key.String,
+		Secret: secret.String,
 	}
 
 	return
@@ -140,11 +136,11 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 
 	for rows.Next() {
 		var (
-			id         sql.NullString
-			name       sql.NullString
-			email      sql.NullString
-			key        sql.NullString
-			secret     sql.NullString
+			id     sql.NullInt32
+			name   sql.NullString
+			email  sql.NullString
+			key    sql.NullString
+			secret sql.NullString
 		)
 
 		err := rows.Scan(
@@ -159,19 +155,19 @@ func (u *userRepo) GetAll(ctx context.Context, req *auth_service.UserListRequest
 			return resp, err
 		}
 
-		resp.Users = append(resp.Users,  &auth_service.User{
-			Id:        id.String,
-			Name:      name.String,
-			Email:     email.String,
-			Key:       key.String,
-			Secret:    secret.String,
+		resp.Users = append(resp.Users, &auth_service.User{
+			Id:     id.Int32,
+			Name:   name.String,
+			Email:  email.String,
+			Key:    key.String,
+			Secret: secret.String,
 		})
 	}
 
 	return
 }
 
-func (u *userRepo) GetUserByUsername( ctx context.Context,req *auth_service.GetByName)(resp *auth_service.User, err error){
+func (u *userRepo) GetUserByUsername(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
 	query := `
 		SELECT 
 			id,
@@ -184,11 +180,11 @@ func (u *userRepo) GetUserByUsername( ctx context.Context,req *auth_service.GetB
 	`
 
 	var (
-		id         sql.NullString
-		name       sql.NullString
-		email      sql.NullString
-		key        sql.NullString
-		secret     sql.NullString
+		id     sql.NullInt32
+		name   sql.NullString
+		email  sql.NullString
+		key    sql.NullString
+		secret sql.NullString
 	)
 
 	err = u.db.QueryRow(ctx, query, req.Name).Scan(
@@ -203,11 +199,11 @@ func (u *userRepo) GetUserByUsername( ctx context.Context,req *auth_service.GetB
 	}
 
 	resp = &auth_service.User{
-		Id:        id.String,
-		Name:      name.String,
-		Email:     email.String,
-		Key:       key.String,
-		Secret:    secret.String,
+		Id:     id.Int32,
+		Name:   name.String,
+		Email:  email.String,
+		Key:    key.String,
+		Secret: secret.String,
 	}
 
 	return

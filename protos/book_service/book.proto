@@ -5,7 +5,7 @@ option go_package="genproto/book_service";
 import "google/protobuf/struct.proto";
 
 message Book {
-    string id = 1;
+    int32 id = 1;
     string isbn = 2;
     string title = 3;
     string cover = 4;
@@ -15,11 +15,11 @@ message Book {
     int32 status = 8; // 0-new, 1-reading, 2-finished,
 }
 
-message CreateBookResponse {
+message BookResponse {
     repeated BookData data = 1;
     bool is_ok = 2;
     string message = 3;
-}
+  }
 
 message BookData {
     Book book = 1;
@@ -31,7 +31,7 @@ message CreateBook {
 }
 
 message UpdateBook {
-    string id = 1;
+    int32 id = 1;
     string isbn = 2;
     string title = 3;
     string cover = 4;
@@ -42,12 +42,12 @@ message UpdateBook {
 }
 
 message UpdatePatchBook {
-    string id = 1;
-    google.protobuf.Struct fields = 2;
+    int32 id = 1;
+    string status = 2;
 }
 
 message BookPK {
-    string id = 1;
+    int32 id = 1;
 }
 
 message BookByTitle {
@@ -61,6 +61,6 @@ message BookListRequest{
 }
 
 message BookListResponse {
-    int32 count = 1;
+    int64 count = 1;
     repeated Book books = 2;
 }

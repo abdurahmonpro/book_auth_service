@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package book_service;
 option go_package="genproto/book_service";
-import "google/protobuf/struct.proto";
+
 
 message Book {
     int32 id = 1;
@@ -17,7 +17,19 @@ message Book {
 
 message BookResponse {
     repeated BookData data = 1;
-    bool is_ok = 2;
+    bool isOk = 2;
+    string message = 3;
+  }
+
+  message BookResponseByItem {
+    repeated Book data = 1;
+    bool isOk = 2;
+    string message = 3;
+  }
+
+  message OneBookResponse {
+    BookData data = 1;
+    bool isOk = 2;
     string message = 3;
   }
 
@@ -43,7 +55,7 @@ message UpdateBook {
 
 message UpdatePatchBook {
     int32 id = 1;
-    string status = 2;
+    int32 status = 2;
 }
 
 message BookPK {
